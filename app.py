@@ -441,7 +441,22 @@ input_data = {
 
 input_df = pd.DataFrame(input_data)
 
+missing_cols = [
+    'Bore', 'utype', 'Front Tread', 'Gross Weight', 'Rear Tread', 
+    'Compression Ratio', 'Steering Type', 'exterior_color', 'Color', 
+    'Turning Radius', 'Doors', 'Top Speed', 'Acceleration', 
+    'Fuel Suppy System', 'Stroke', 'oem', 'Alloy Wheel Size', 
+    'model_type_new', 'discountValue', 'Tyre Type', 'state', 
+    'Rear Brake Type', 'carType', 'Gear Box', 'model', 
+    'No of Cylinder', 'Max Power At', 'Valves per Cylinder', 
+    'Front Brake Type', 'Ground Clearance Unladen', 'dvn', 
+    'Kerb Weight', 'Cargo Volume', 'Valve Configuration', 
+    'Engine Type', 'Drive Type', 'Max Torque At', 
+    'Max Torque Delivered', 'variant'
+]
 
+for col in missing_cols:
+    input_df[col] = np.nan
 # Align with training columns
 TRAIN_COLUMNS = None
 
@@ -519,25 +534,30 @@ with footer_col3:
     st.markdown("**Python** • **Streamlit** • **Scikit-Learn** • **Pandas**")
 
 
-st.markdown(f"""
+st.markdown("""
 <hr style="margin-top:2.2rem; background: linear-gradient(90deg, transparent, #00d4ff, transparent); 
-           border:none; height:2px;">
-<div style="text-align:center; padding:1.5rem 0; font-size:0.9rem; 
-           background: rgba(0,212,255,0.05); border-radius:15px; margin-top:1rem;">
+            border:none; height:2px;">
+
+<div class="footer" style="text-align:center; padding:1.5rem 0; font-size:0.9rem; 
+            background: rgba(0,212,255,0.05); border-radius:15px; margin-top:1rem;">
+  
   <div style="color:#00d4ff; margin-bottom:0.5rem;">
     © 2025 <span style="font-weight:900; font-size:1.1rem; 
     background: linear-gradient(90deg, #00d4ff, #ff0080, #7928ca); 
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
     AutoPredict AI</span>
   </div>
+  
   <div style="color:#a0a0a0; font-size:0.85rem; margin-bottom:1rem;">
     🚗 Used Car Price Intelligence · Powered by Machine Learning
   </div>
+  
   <div style="margin-bottom:0.8rem;">
     <span style="color:#ffffff; font-weight:600;">Crafted by </span>
     <span style="font-weight:900; color:#ff0080; font-size:1.05rem;">Mayank Goyal</span>
   </div>
-  <div style="margin-bottom:1rem;">
+  
+  <div class="footer-links" style="margin-bottom:1rem;">
     <a href="https://www.linkedin.com/in/mayank-goyal-4b8756363" target="_blank"
        style="display:inline-block; background:rgba(0,212,255,0.1); color:#00d4ff; 
        text-decoration:none; font-weight:700; padding:0.5rem 1.2rem; 
@@ -551,18 +571,20 @@ st.markdown(f"""
        transition: all 0.3s ease;">
        💻 GitHub</a>
   </div>
+  
   <div style="font-size:0.75rem; color:#666; letter-spacing:1px;">
     ⚡ Random Forest Algorithm · 📊 CarDekho Real Data · 🔮 Real-time Price Estimation
   </div>
 </div>
 
 <style>
-a:hover {
+.footer-links a:hover {
     transform: translateY(-2px) !important;
     box-shadow: 0 5px 15px rgba(0,212,255,0.4) !important;
 }
 </style>
 """, unsafe_allow_html=True)
+
 
 
 
