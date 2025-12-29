@@ -240,13 +240,17 @@ def load_custom_css():
 @st.cache_resource
 def load_model():
     file_id = "1ZsYxc9lAA8uaUPmYIka3q0B97OfbPzkF"
-    url = f"https://drive.google.com/uc?id={file_id}&export=download"
+    url = f"https://drive.google.com/uc?export=download&id={file_id}"
 
-    response = requests.get(url)
-    response.raise_for_status()  # fail fast if download breaks
+    session = requests.Session()
+    response = session.get(url, stream=True)
+    response.raise_for_status()
 
-    model = pickle.load(io.BytesIO(response.content))
-    return model
+    # 🚨 sanity check
+    if "text/html" in response.headers.get("Content-Type", ""):
+        raise RuntimeError("Google Drive returned HTML instead of the .pkl file")
+
+    return pickle.load(io.BytesIO(response.content))
 
 
 model = load_model()
@@ -507,3 +511,4 @@ a:hover {
 }
 </style>
 """, unsafe_allow_html=True)
+
