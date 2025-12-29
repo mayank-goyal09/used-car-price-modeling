@@ -1,10 +1,16 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import pickle
-import requests
-import io
-
+import joblib
+import matplotlib.pyplot as plt
+import seaborn as sns
+from datetime import datetime, timedelta
+from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
+import plotly.graph_objects as go
+import plotly.express as px
+import os
+import tempfile
+import gdown
 # -----------------------
 # Custom CSS - Car Theme
 # -----------------------
@@ -237,21 +243,65 @@ def load_custom_css():
 # -----------------------
 # Load trained pipeline
 # -----------------------
-@st.cache_resource
-def load_model():
-    file_id = "1ZsYxc9lAA8uaUPmYIka3q0B97OfbPzkF"
-    url = f"https://drive.google.com/uc?export=download&id={file_id}"
+import os
+import tempfile
+import numpy as np
+import pandas as pd
+import joblib
+import streamlit as st
+from sklearn.metrics import (
+    r2_score,
+    mean_absolute_error,
+    mean_squared_error
+)
 
+def download_file_from_gdrive(file_id, output_path):
+    # direct download URL format
+    url = "https://drive.google.com/uc?export=download"
     session = requests.Session()
-    response = session.get(url, stream=True)
+
+    response = session.get(url, params={"id": file_id}, stream=True)
     response.raise_for_status()
 
-    # 🚨 sanity check
-    if "text/html" in response.headers.get("Content-Type", ""):
-        raise RuntimeError("Google Drive returned HTML instead of the .pkl file")
+    token = None
+    for key, value in response.cookies.items():
+        if key.startswith("download_warning"):
+            token = value
+            break
 
-    return pickle.load(io.BytesIO(response.content))
+    if token:  # handle Drive confirmation token
+        response = session.get(
+            url, params={"id": file_id, "confirm": token}, stream=True
+        )
+        response.raise_for_status()
 
+    with open(output_path, "wb") as f:
+        for chunk in response.iter_content(chunk_size=32768):
+            if chunk:
+                f.write(chunk)
+
+
+@st.cache_resource
+def load_model():
+    file_id = "1ZsYxc9lAA8uaUPmYIka3q0B97OfbPzkF"  # your Drive file ID
+    model_name = "used_car_price_model.pkl"
+
+    temp_dir = tempfile.gettempdir()
+    model_path = os.path.join(temp_dir, model_name)
+
+    if not os.path.exists(model_path):
+        with st.spinner("⬇️ Downloading model (one-time)..."):
+            download_file_from_gdrive(file_id, model_path)
+
+    if os.path.getsize(model_path) < 10_000:
+        raise RuntimeError("Downloaded file looks too small — likely HTML, not the model.")
+
+    try:
+        return joblib.load(model_path)
+    except Exception as e:
+        st.error("❌ Model downloaded but failed to load.")
+        st.exception(e)
+        st.stop()
 
 model = load_model()
 
@@ -511,4 +561,5 @@ a:hover {
 }
 </style>
 """, unsafe_allow_html=True)
+
 
