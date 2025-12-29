@@ -2,7 +2,9 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import pickle
-
+import joblib
+import requests
+from pathlib import Path
 
 # -----------------------
 # Custom CSS - Car Theme
@@ -236,14 +238,28 @@ def load_custom_css():
 # -----------------------
 # Load trained pipeline
 # -----------------------
+
+
+MODEL_URL = "https://drive.google.com/uc?export=download&id=1ZsYxc9lAA8uaUPmYIka3q0B97OfbPzkF"
+MODEL_PATH = Path("models")
+MODEL_FILE = MODEL_PATH / "used_car_model.joblib"
+
+
 @st.cache_resource
 def load_model():
-    with open("used_car_price_model.pkl", "rb") as f:
-        model = pickle.load(f)
+    MODEL_PATH.mkdir(exist_ok=True)
+
+    if not MODEL_FILE.exists():
+        with st.spinner("Downloading model from cloud (one-time)..."):
+            resp = requests.get(MODEL_URL, stream=True)
+            resp.raise_for_status()
+            with open(MODEL_FILE, "wb") as f:
+                for chunk in resp.iter_content(chunk_size=8192):
+                    if chunk:
+                        f.write(chunk)
+
+    model = joblib.load(MODEL_FILE)
     return model
-
-
-model = load_model()
 
 
 # -----------------------
@@ -501,3 +517,4 @@ a:hover {
 }
 </style>
 """, unsafe_allow_html=True)
+
