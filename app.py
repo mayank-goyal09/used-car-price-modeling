@@ -11,6 +11,8 @@ import plotly.express as px
 import os
 import tempfile
 import gdown
+import requests
+
 # -----------------------
 # Custom CSS - Car Theme
 # -----------------------
@@ -561,5 +563,6 @@ a:hover {
 }
 </style>
 """, unsafe_allow_html=True)
+
 
 
